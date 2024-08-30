@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.MuiPaper-root {
+  @apply bg-colDark90 text-colWhite80 flex flex-col p-4 w-1/2;
+}
+
+.color-label {
+  @apply w-[40px] h-[40px] rounded-[50%] cursor-pointer relative;
+}
+
+input:checked + .color-label {
+  @apply after:content-[''] after:absolute after:-top-[6px] after:-left-[6px] after:-right-[6px] after:-bottom-[6px] after:border-colMedSlateBlue after:border-2 after:rounded-[50%];
+}
+
+.resolution-lable {
+  @apply px-3 py-2 bg-colDark80 rounded-lg cursor-pointer;
+}
+
+input:checked + .resolution-lable {
+  @apply bg-colMedSlateBlue;
+}
+
+.MuiSlider-rail,
+.MuiSlider-track {
+  @apply bg-colDark70 h-2 border-none;
+}
+
+.auth-profile .floating-signout-button {
+  @apply absolute left-14 top-0 py-2 px-2 normal-case rounded-lg items-center w-[8rem] text-lg hidden;
+}
+
+.auth-profile:hover .floating-signout-button {
+  @apply flex animate-reveal;
+}
+
+.main-layout {
+  @apply px-10 sm:pl-32 sm:pr-10 pt-14 lg:px-[10%] lg:pr-24 h-[100vh];
+}
+
+.loading {
+  background: #394150;
+  background: linear-gradient(110deg, #394150 8%, #394150 18%, #394150 33%);
+  background-size: 200% 100%;
+  animation: 1.5s shine linear infinite;
+}
+
+@keyframes shine {
+  to {
+    background-position-x: -200%;
+  }
+}
