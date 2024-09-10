@@ -25,6 +25,9 @@ export const GenerateImageButton = styled(Button)<ButtonProps>(() => ({
   textTransform: 'capitalize',
   '&.active': {
     backgroundColor: '#7C71FF'
+  },
+  '&.Mui-disabled': {
+    color: '#E4E4E7'
   }
 }));
 
@@ -80,13 +83,13 @@ export const PagesButton: React.FC<PaginationProps> = (props) => {
       switch (paths[0]) {
         case 'feed':
           router.push(`/${paths[0]}/feed/${value}`);
-          break
+          break;
         case 'collection':
           router.push(`/${paths[0]}/collection/${value}`);
-          break
+          break;
         case 'history':
           router.push(`/${paths[0]}/history/${value}`);
-          break
+          break;
       }
     }
   };
@@ -133,7 +136,15 @@ export const SaveImageButton: React.FC<SaveButtonProps> = ({ isSaved, ...props }
 
 export const DownloadButton: React.FC<DownloadButtonProps> = ({ fileId, ...props }) => {
   return (
-    <Button {...props} onClick={downloadImage.bind(null, `/api/image/${fileId}`, fileId)}>
+    <Button
+      {...props}
+      onClick={downloadImage.bind(null, `/api/image/${fileId}`, fileId)}
+      sx={{
+        color: '#E4E4E7',
+        '&.Mui-disabled': {
+          color: '#E4E4E7'
+        }
+      }}>
       Download
     </Button>
   );
@@ -155,7 +166,10 @@ export const GenerateWithSettingsButton: React.FC<GenerateWithSettingsButtonProp
       sx={{
         backgroundColor: '#7C71FF',
         color: '#E4E4E7',
-        textTransform: 'none'
+        textTransform: 'none',
+        '&.Mui-disabled': {
+          color: '#E4E4E7'
+        }
       }}>
       Generate with this settings
     </Button>

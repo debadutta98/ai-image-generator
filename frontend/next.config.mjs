@@ -16,7 +16,7 @@ const nextConfig = {
     ]
   },
   experimental: {
-    proxyTimeout: 60_000,
+    proxyTimeout: 120_000,
     staleTimes: {
       dynamic: 0,
     },
