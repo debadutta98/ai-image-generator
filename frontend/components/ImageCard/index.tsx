@@ -25,8 +25,6 @@ const ImageCard: React.FC<ImageCardProps> = (props) => {
         status = res.status;
         if (res.ok) {
           return await res.json();
-        } else {
-          toast.error('Something went wrong. Please try again!');
         }
       })
       .then(() => {
@@ -37,8 +35,13 @@ const ImageCard: React.FC<ImageCardProps> = (props) => {
       })
       .finally(() => {
         setDisabled(false);
-        if (status === 401) {
-          context.setAuth(false);
+        if (status <= 199 || status >= 300) {
+          if (status === 401) {
+            context.setAuth(false);
+            context.openLoginScreen();
+          } else {
+            toast.error('Something went wrong. Please try again!');
+          }
         }
       });
   };

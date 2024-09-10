@@ -9,7 +9,7 @@ export default function Empty(props: { message?: string }) {
     <Error>
       <h2 className="font-semibold">Empty Response - No data received</h2>
       <span>
-        {(name && typeof name === 'string')
+        {name && typeof name === 'string'
           ? `Hi ${name.split(' ')[0]}, ${props.message || 'no image has been generated.'}`
           : 'No image has been generated'}
       </span>

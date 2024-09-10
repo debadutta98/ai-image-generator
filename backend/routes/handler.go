@@ -209,8 +209,6 @@ func generateImage(context *gin.Context) {
 		return
 	} else {
 
-		defer res.Body.Close()
-
 		content_type := res.Header.Get("Content-Type")
 
 		if res.StatusCode != http.StatusOK || content_type == "application/json" {
@@ -221,9 +219,11 @@ func generateImage(context *gin.Context) {
 		session := sessions.Default(context)
 		userId := session.Get("user_id")
 
+		isDone := make(chan bool, 1)
+
 		go func(res *http.Response, userId interface{}, contentType string) {
 			format, err := mime.ExtensionsByType(contentType)
-			if err != nil {
+			if err == nil {
 				filemeta := db.FileMeta{
 					GeneratedBy: userId,
 					GeneratedAt: time.Now(),
@@ -244,9 +244,15 @@ func generateImage(context *gin.Context) {
 					})
 				}
 			}
+			isDone <- true
 		}(res, userId, content_type)
 
 		context.DataFromReader(200, res.ContentLength, content_type, res.Body, nil)
+
+		if <-isDone {
+			close(isDone)
+			res.Body.Close()
+		}
 	}
 
 }

@@ -40,9 +40,6 @@ export default function Home() {
         status = res.status;
         if (res.ok) {
           return await res.blob();
-        } else {
-          toast.error('Something went wrong. Please try again!');
-          helper.setSubmitting(false);
         }
       })
       .then((data) => {
@@ -61,12 +58,16 @@ export default function Home() {
         }
       })
       .catch(() => {
-        toast.error('Something went wrong. Please try again!');
         helper.setSubmitting(false);
       })
       .finally(() => {
-        if (status === 401) {
-          context.setAuth(false);
+        if (status <= 199 || status >= 300) {
+          if (status === 401) {
+            context.setAuth(false);
+            context.openLoginScreen();
+          } else {
+            toast.error('Something went wrong. Please try again!');
+          }
         }
       });
   };
