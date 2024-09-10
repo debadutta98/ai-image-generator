@@ -264,11 +264,12 @@ func generateImage(context *gin.Context) {
 						return false
 					}
 				} else {
-					if _, err = w.Write(buf[:n]); err != nil {
+					chunk := buf[:n]
+					if _, err = w.Write(chunk); err != nil {
 						log.Printf("Error while writing data: %v", err)
 						return false
 					}
-					if _, err = pw.Write(buf[:n]); err != nil {
+					if _, err = pw.Write(chunk); err != nil {
 						log.Printf("Error while writing data: %v", err)
 					}
 				}
