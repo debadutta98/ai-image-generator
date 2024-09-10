@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+export const maxDuration = 120_000
+
 export function middleware(request: NextRequest) {
   const url = new URL(
     request.nextUrl.toString().replace(request.nextUrl.origin, process.env.BACKEND_URL as string)
@@ -13,5 +15,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/api/:path*']
+  matcher: ['/api/:path*'],
 };
