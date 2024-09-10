@@ -40,6 +40,8 @@ export default function Home() {
         status = res.status;
         if (res.ok) {
           return await res.blob();
+        } else {
+          helper.setSubmitting(false);
         }
       })
       .then((data) => {
