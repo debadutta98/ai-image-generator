@@ -42,7 +42,8 @@ export default function Header(props: AuthComponentProps) {
         onClose={() => setShowDrawer(false)}
         onOpen={() => setShowDrawer(true)}
         disableSwipeToOpen={true}
-        className="block sm:hidden"
+        elevation={20}
+        className="block sm:hidden w-10/12"
       >
         <CloseButton onClick={() => setShowDrawer(false)} />
         <List className="mt-[50px] flex flex-col gap-3">

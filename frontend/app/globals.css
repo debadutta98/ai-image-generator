@@ -51,3 +51,13 @@ input:checked + .resolution-lable {
     background-position-x: -200%;
   }
 }
+
+.MuiDrawer-paper {
+  width: 60% !important;
+}
+
+@media (max-width: 400px) {
+  .MuiDrawer-paper {
+    width: 80% !important;
+  }
+}
