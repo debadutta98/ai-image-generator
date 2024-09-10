@@ -3,7 +3,6 @@ module github.com/debadutta98/ai-image-generator
 go 1.21.6
 
 require (
-	github.com/Kardbord/hfapigo/v3 v3.0.0
 	github.com/gin-contrib/sessions v1.0.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0

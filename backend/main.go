@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/Kardbord/hfapigo/v3"
 	"github.com/debadutta98/ai-image-generator/db"
 	"github.com/debadutta98/ai-image-generator/routes"
 	"github.com/debadutta98/ai-image-generator/utils"
@@ -17,10 +16,8 @@ import (
 func main() {
 
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error while loading env file", err)
+		log.Println("Error while loading env file", err)
 	}
-
-	hfapigo.SetAPIKey(os.Getenv("HUGGINGFACE_MODEL_API_KEY"))
 
 	db.ConnectDB()
 

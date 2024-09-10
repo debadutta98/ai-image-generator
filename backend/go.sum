@@ -1,5 +1,3 @@
-github.com/Kardbord/hfapigo/v3 v3.0.0 h1:m9PjPMcKsCpH1FajjA0OuahKKJNgb9ShRd2ZBC69FTI=
-github.com/Kardbord/hfapigo/v3 v3.0.0/go.mod h1:1IqUHTJ802DRgXLxGCEdBLv23r4JkxXZ34TXvJhtopo=
 github.com/bos-hieu/mongostore v0.0.3 h1:wla8pz4VQU8JOcbo+sBbuvFVBBHt3yRelVSi6YInC48=
 github.com/bos-hieu/mongostore v0.0.3/go.mod h1:8AbbVmDEb0yqJsBrWxZIAZOxIfv/tsP8CDtdHduZHGg=
 github.com/bytedance/sonic v1.11.9 h1:LFHENlIY/SLzDWverzdOvgMztTxcfcF+cqNsz9pK5zg=
