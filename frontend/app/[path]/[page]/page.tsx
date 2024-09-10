@@ -59,7 +59,9 @@ export default async function Page({ params, searchParams }: PageProps) {
       ) : status === 401 ? (
         <Unauthorized />
       ) : (
-        <Empty message={`no image has been ${params.path === "collection" ? "added" : "generated"}`} />
+        <Empty
+          message={`no image has been ${params.path === 'collection' ? 'added' : 'generated'}`}
+        />
       )}
       {pages > 1 && (
         <PagesButton

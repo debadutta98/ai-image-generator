@@ -28,7 +28,8 @@ export default function Layout({
               </div>
             ))}
           </GallerySkeleton>
-        }>
+        }
+      >
         {children}
       </Suspense>
       {settings}

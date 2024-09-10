@@ -41,7 +41,8 @@ export const NavProfileButton: React.FC<HTMLProps<HTMLButtonElement>> = (props) 
   return (
     <div
       className="mt-auto relative pb-2 px-2 auth-profile cursor-pointer"
-      onClick={onClickHandler}>
+      onClick={onClickHandler}
+    >
       {props.children}
     </div>
   );
@@ -82,13 +83,13 @@ export const PagesButton: React.FC<PaginationProps> = (props) => {
     if (Array.isArray(paths) && paths.length > 0) {
       switch (paths[0]) {
         case 'feed':
-          router.push(`/${paths[0]}/feed/${value}`);
+          router.push(`/feed/${value}`);
           break;
         case 'collection':
-          router.push(`/${paths[0]}/collection/${value}`);
+          router.push(`/collection/${value}`);
           break;
         case 'history':
-          router.push(`/${paths[0]}/history/${value}`);
+          router.push(`/history/${value}`);
           break;
       }
     }
@@ -128,7 +129,8 @@ export const SaveImageButton: React.FC<SaveButtonProps> = ({ isSaved, ...props }
         '&.Mui-disabled': {
           backgroundColor: isSaved ? '#7C71FF' : '#212936'
         }
-      }}>
+      }}
+    >
       <Image src={'/assets/bookmark.svg'} width={22} height={22} alt="save icon" />
     </IconButton>
   );
@@ -144,7 +146,8 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({ fileId, ...props
         '&.Mui-disabled': {
           color: '#E4E4E7'
         }
-      }}>
+      }}
+    >
       Download
     </Button>
   );
@@ -170,7 +173,8 @@ export const GenerateWithSettingsButton: React.FC<GenerateWithSettingsButtonProp
         '&.Mui-disabled': {
           color: '#E4E4E7'
         }
-      }}>
+      }}
+    >
       Generate with this settings
     </Button>
   );
