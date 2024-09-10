@@ -42,36 +42,35 @@ func AuthCallBackHandler(context *gin.Context) {
 	)
 
 	if cookie, err := context.Request.Cookie("state"); err != nil || cookie.Value != state {
-		context.Redirect(http.StatusSeeOther, "/?status=failed")
+		context.Redirect(http.StatusSeeOther, "/")
 		return
 	}
 
 	res, err := api.GetGitHubAccessToken(api.GetTokenRequestBody{ClientId: client_id, ClientSecret: client_secret, Code: code})
 
 	if err != nil {
-		context.Redirect(http.StatusSeeOther, "/?status=failed")
+		context.Redirect(http.StatusSeeOther, "/")
 		return
 	}
 
 	data := make(map[string]string)
 
 	if err := json.NewDecoder(res.Body).Decode(&data); err != nil {
-		context.Redirect(http.StatusSeeOther, "/?status=failed")
+		context.Redirect(http.StatusSeeOther, "/")
 		return
 	}
 
 	if access_token, ok := data["access_token"]; ok {
 		if res, err := api.GetUserInfo(access_token); err != nil {
-			context.Redirect(http.StatusSeeOther, "/?status=failed")
+			context.Redirect(http.StatusSeeOther, "/")
 			return
 		} else {
 			userInfo := make(map[string]interface{})
 			if err := json.NewDecoder(res.Body).Decode(&userInfo); err != nil {
-				context.Redirect(http.StatusSeeOther, "/?status=failed")
+				context.Redirect(http.StatusSeeOther, "/")
 				return
 			}
 			session := sessions.Default(context)
-			var authType string
 			if id, ok := userInfo["id"].(float64); ok {
 				if usr, err := db.GetUser(id); err != nil {
 					//Sing up new user
@@ -112,29 +111,27 @@ func AuthCallBackHandler(context *gin.Context) {
 						Profile_BIO: bio,
 						User_Id:     id,
 					}); err != nil {
-						context.Redirect(http.StatusSeeOther, "/?status=failed")
+						context.Redirect(http.StatusSeeOther, "/")
 						return
 					}
 					session.Set("name", name)
 					session.Set("profile_img", avatar_url)
 					session.Set("user_id", id)
-					authType = "signup"
 				} else {
 					session.Set("name", usr.Name)
 					session.Set("profile_img", usr.Profile_Img)
 					session.Set("user_id", usr.User_Id)
-					authType = "login"
 				}
 			}
 			if err := session.Save(); err != nil {
-				context.Redirect(http.StatusSeeOther, "/?status=failed")
+				context.Redirect(http.StatusSeeOther, "/")
 				return
 			}
-			context.Redirect(http.StatusSeeOther, "/?status=success&type="+authType)
+			context.Redirect(http.StatusSeeOther, "/")
 			return
 		}
 	} else {
-		context.Redirect(http.StatusSeeOther, "/?status=failed")
+		context.Redirect(http.StatusSeeOther, "/")
 		return
 	}
 }
@@ -499,15 +496,9 @@ func deleteUserFromImageCollection(context *gin.Context) {
 
 func getImageSetting(context *gin.Context) {
 	var (
-		userId interface{}
 		imgeId string
 		_id    primitive.ObjectID
 	)
-
-	if userId = sessions.Default(context).Get("user_id"); userId == nil {
-		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorize access to user route"})
-		return
-	}
 
 	if err := utils.GetValue(context.Param("imageId"), &imgeId); err != nil {
 		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "imageId must be of type string"})

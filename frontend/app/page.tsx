@@ -9,9 +9,12 @@ import { FormSubmitValue } from '@/types';
 import { useEffect, useState } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import { getImageSettings } from '../utils';
+import toast from 'react-hot-toast';
+import { useAppContext } from '@/context';
 
 export default function Home() {
   const [imageSrc, setImageSrc] = useState<string>('/assets/Box-shape.png');
+  const context = useAppContext();
   useEffect(() => {
     return () => sessionStorage.removeItem('imageSettings');
   });
@@ -19,6 +22,7 @@ export default function Home() {
     helper.setSubmitting(true);
     setImageSrc('/assets/Box-shape.png');
     const [width, height] = values.resolution.split(' x ').map((val) => Number.parseInt(val));
+    let status: number;
     fetch('/api/image/generate', {
       method: 'POST',
       credentials: 'include',
@@ -33,9 +37,11 @@ export default function Home() {
       })
     })
       .then(async (res) => {
+        status = res.status;
         if (res.ok) {
           return await res.blob();
         } else {
+          toast.error('Something went wrong. Please try again!');
           helper.setSubmitting(false);
         }
       })
@@ -55,7 +61,13 @@ export default function Home() {
         }
       })
       .catch(() => {
+        toast.error('Something went wrong. Please try again!');
         helper.setSubmitting(false);
+      })
+      .finally(() => {
+        if (status === 401) {
+          context.setAuth(false);
+        }
       });
   };
   return (
@@ -83,7 +95,7 @@ export default function Home() {
           const isDefaultImage = imageSrc === '/assets/Box-shape.png';
           return (
             <>
-              <Form className="flex flex-col gap-[40px]">
+              <Form className="flex flex-col gap-[40px] h-fit">
                 <div className="flex flex-col gap-4">
                   <label htmlFor="prompt" className="text-colDark60 capitalize font-semibold">
                     Prompt

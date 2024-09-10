@@ -2,7 +2,7 @@
 import { LoginButton } from '@/components/Button';
 import ClientModal from '..';
 import Image from 'next/image';
-import { useAppContext } from '@/context/intext';
+import { useAppContext } from '@/context';
 
 export default function LoginModal() {
   const context = useAppContext();

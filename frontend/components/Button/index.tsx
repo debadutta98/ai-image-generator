@@ -1,18 +1,13 @@
 'use client';
-import { useAppContext } from '@/context/intext';
+import { useAppContext } from '@/context';
 import Button from '@mui/material/Button';
 import { ButtonProps } from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
 import Image from 'next/image';
-import React, { HTMLProps, useEffect, useState } from 'react';
+import React, { HTMLProps } from 'react';
 import Pagination, { PaginationProps } from '@mui/material/Pagination';
-import IconButton, { IconButtonProps } from '@mui/material/IconButton';
-import {
-  DownloadButtonProps,
-  GenerateWithSettingsButtonProps,
-  SaveButtonProps,
-  SaveButtonState
-} from '@/types';
+import IconButton from '@mui/material/IconButton';
+import { DownloadButtonProps, GenerateWithSettingsButtonProps, SaveButtonProps } from '@/types';
 import { downloadImage } from '@/utils';
 import { useRouter } from 'next/navigation';
 

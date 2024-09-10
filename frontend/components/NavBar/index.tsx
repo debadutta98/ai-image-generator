@@ -1,10 +1,13 @@
+'use client';
 import Link from 'next/link';
 import Image from 'next/image';
 import { NavProfileButton, SignOutButton } from '../Button';
 import NavLink from '../NavLink';
 import { AuthComponentProps } from '@/types';
+import { useAppContext } from '@/context';
 
 export default function NavBar(props: AuthComponentProps) {
+  const context = useAppContext();
   return (
     <nav className="sm:flex flex-col p-4 border-colDark80 border-r-2 items-center hidden fixed left-0 bottom-0 top-0 z-50">
       <ul>
@@ -50,13 +53,13 @@ export default function NavBar(props: AuthComponentProps) {
       </ul>
       <NavProfileButton>
         <Image
-          src={props.auth ? (props.profileURL as string) : '/assets/signin.svg'}
-          alt={props.auth ? 'profile icon' : 'sign in'}
-          className={props.auth ? 'rounded-[50%] object-cover' : 'rounded-lg bg-colDark80 p-2'}
+          src={context.auth ? (props.profileURL as string) : '/assets/signin.svg'}
+          alt={context.auth ? 'profile icon' : 'sign in'}
+          className={context.auth ? 'rounded-[50%] object-cover' : 'rounded-lg bg-colDark80 p-2'}
           width={40}
           height={40}
         />
-        {props.auth && (
+        {context.auth && (
           <SignOutButton
             className="floating-signout-button"
             href="/auth/logout"

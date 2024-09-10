@@ -29,6 +29,13 @@ const nextConfig = {
       { source: '/auth/:path*', destination: `${process.env.BACKEND_URL}/auth/:path*`}
     ];
   },
+  async redirects() {
+    return [
+      {source: '/feed', destination:'/feed/1', permanent: true},
+      {source:'/history', destination:'/history/1',permanent: true},
+      {source:'/collection', destination:'/collection/1',permanent: true}
+    ]
+  }
 };
 
 export default nextConfig;

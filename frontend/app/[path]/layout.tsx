@@ -1,3 +1,4 @@
+import Search from '@/components/Search';
 import Image from 'next/image';
 import { redirect, RedirectType } from 'next/navigation';
 
@@ -22,14 +23,7 @@ export default function Layout({
       {path === 'feed' ? (
         <div>
           <div className="flex gap-1 bg-colDark90 rounded-xl border-colDark80 border-2 outline-none w-[80%] sm:w-[60%] lg:w-[40%] xl:w-[30%]">
-            <form method="GET" className="w-[100%]" action="/feed/1">
-              <input
-                type="text"
-                name="search"
-                placeholder="Search images by keywords"
-                className="p-4 bg-colDark90 text-lg text-colWhite80 outline-none border-none placeholder-colDark60 w-[100%] rounded-xl"
-              />
-            </form>
+            <Search />
             <Image
               src="/assets/Search.svg"
               width={30}

@@ -26,6 +26,7 @@ export interface AppContext {
   openLoginScreen: () => void;
   closeLoginScreen: () => void;
   [key: string]: any;
+  setAuth: (a: boolean) => void;
 }
 
 export interface User {

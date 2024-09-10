@@ -5,9 +5,9 @@ import NavBar from '@/components/NavBar';
 import Header from '@/components/Header';
 import { cookies } from 'next/headers';
 import { User } from '@/types';
-import AppProviderContext from '@/context/intext';
+import AppProviderContext from '@/context';
 import LoginModal from '@/components/Modal/Login';
-
+import { Toaster } from 'react-hot-toast';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -46,6 +46,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`${inter.className} bg-colDark90 relative z-0`}>
         <AppProviderContext value={{ ...user }}>
+          <Toaster toastOptions={{ position: 'top-right' }} />
           <LoginModal />
           <NavBar auth={user.auth} profileURL={user.profile_url} />
           <Header auth={user.auth} profileURL={user.profile_url} />

@@ -5,12 +5,14 @@ import { History } from '@/types';
 import { cookies } from 'next/headers';
 import Image from 'next/image';
 import { redirect, RedirectType } from 'next/navigation';
+import Unauthorized from '@/components/Error/401';
+import Empty from '@/components/Error/empty';
 
 export default async function Page({ params }: { params: { page: string } }) {
   let histories: Array<History> = [],
     pages: number = 0,
-    status: number,
-    page: number;
+    status: number = 0,
+    page: number = 0;
   if (Number.isNaN(Number(params.page)) || Number.parseInt(params.page) < 1) {
     return redirect('/history/1', RedirectType.replace);
   } else {
@@ -48,7 +50,7 @@ export default async function Page({ params }: { params: { page: string } }) {
   }
   return (
     <>
-      {histories.length > 0 && (
+      {histories.length > 0 ? (
         <div
           className={`grid grid-cols-1 divide-y-[1px] divide-colDark70${pages === 1 ? ' pb-12' : ''}`}
         >
@@ -56,13 +58,13 @@ export default async function Page({ params }: { params: { page: string } }) {
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
             .map((history) => (
               <div className={`flex flex-col lg:flex-row gap-14 py-12 last:pb-0`} key={history._id}>
-                <div className="flex-shrink-0 flex-grow-0 border-[5px] border-colDark80 self-start w-[400px] rounded-lg">
+                <div className="flex-shrink-0 flex-grow-0 border-[5px] border-colDark80 self-start w-[90%] sm:w-[400px] rounded-lg">
                   <Image
                     src={`/api/image/${history.image_Id}`}
                     width={history.width}
                     height={history.height}
                     alt="mena"
-                    className="rounded-lg h-auto"
+                    className="rounded-lg h-auto w-full"
                   />
                 </div>
                 <dl className="grid grid-cols-auto-fit-320 auto-rows-min gap-8 w-[100%]">
@@ -112,6 +114,10 @@ export default async function Page({ params }: { params: { page: string } }) {
               </div>
             ))}
         </div>
+      ) : status === 401 ? (
+        <Unauthorized />
+      ) : (
+        <Empty message="no image has been generated yet." />
       )}
       {pages > 1 && (
         <PagesButton

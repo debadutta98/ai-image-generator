@@ -1,4 +1,6 @@
 import { PagesButton } from '@/components/Button';
+import Unauthorized from '@/components/Error/401';
+import Empty from '@/components/Error/empty';
 import Gallery from '@/components/Gallery';
 import { PageProps, UserFeeds, Feed } from '@/types';
 import { cookies } from 'next/headers';
@@ -47,12 +49,18 @@ export default async function Page({ params, searchParams }: PageProps) {
   }
   return (
     <>
-      <Gallery
-        maxWidth={300}
-        className={`${pages === 1 ? 'pb-12' : ''}`}
-        feeds={feeds}
-        isUserCollection={params.path === 'collection'}
-      />
+      {feeds.length > 0 ? (
+        <Gallery
+          maxWidth={300}
+          className={`${pages === 1 ? 'pb-12' : ''}`}
+          feeds={feeds}
+          isUserCollection={params.path === 'collection'}
+        />
+      ) : status === 401 ? (
+        <Unauthorized />
+      ) : (
+        <Empty />
+      )}
       {pages > 1 && (
         <PagesButton
           count={pages}

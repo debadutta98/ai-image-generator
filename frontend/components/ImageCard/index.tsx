@@ -5,9 +5,12 @@ import { ImageCardProps } from '@/types';
 import { useState } from 'react';
 import Link from 'next/link';
 import { getWindow } from '@/utils';
+import toast from 'react-hot-toast';
+import { useAppContext } from '@/context';
 
 const ImageCard: React.FC<ImageCardProps> = (props) => {
   const [disabled, setDisabled] = useState<boolean>(props.isDisabled);
+  const context = useAppContext();
   let status: number;
   const onClickHandler = async () => {
     setDisabled(true);
@@ -20,15 +23,23 @@ const ImageCard: React.FC<ImageCardProps> = (props) => {
     })
       .then(async (res) => {
         status = res.status;
-        return await res.json();
+        if (res.ok) {
+          return await res.json();
+        } else {
+          toast.error('Something went wrong. Please try again!');
+        }
       })
       .then(() => {
         if (status === 200) {
+          toast.success(`Image ${!props.feed.isSaved ? 'Saved' : 'Removed'} Successfully`);
           props.onSave(props.feed._id, !props.feed.isSaved ? 'add' : 'remove');
         }
       })
       .finally(() => {
         setDisabled(false);
+        if (status === 401) {
+          context.setAuth(false);
+        }
       });
   };
   const window = getWindow();
