@@ -8,7 +8,7 @@ import React, { HTMLProps } from 'react';
 import Pagination, { PaginationProps } from '@mui/material/Pagination';
 import IconButton from '@mui/material/IconButton';
 import { DownloadButtonProps, GenerateWithSettingsButtonProps, SaveButtonProps } from '@/types';
-import { downloadImage } from '@/utils';
+import { downloadImage, getWindow } from '@/utils';
 import { useRouter } from 'next/navigation';
 
 export const SignOutButton = styled(Button)<ButtonProps>(() => ({
@@ -38,8 +38,7 @@ export const NavProfileButton: React.FC<HTMLProps<HTMLButtonElement>> = (props) 
   return (
     <div
       className="mt-auto relative pb-2 px-2 auth-profile cursor-pointer"
-      onClick={onClickHandler}
-    >
+      onClick={onClickHandler}>
       {props.children}
     </div>
   );
@@ -70,9 +69,31 @@ export const CloseButton: React.FC<HTMLProps<HTMLButtonElement>> = (props) => {
 };
 
 export const PagesButton: React.FC<PaginationProps> = (props) => {
+  const window = getWindow();
+  const router = useRouter();
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    let paths: Array<string> = [];
+    if (typeof window?.location?.pathname === 'string') {
+      paths = window.location.pathname.toLowerCase().split('/');
+    }
+    if (Array.isArray(paths) && paths.length > 0) {
+      switch (paths[0]) {
+        case 'feed':
+          router.push(`/${paths[0]}/feed/${value}`);
+          break
+        case 'collection':
+          router.push(`/${paths[0]}/collection/${value}`);
+          break
+        case 'history':
+          router.push(`/${paths[0]}/history/${value}`);
+          break
+      }
+    }
+  };
   return (
     <Pagination
       {...props}
+      onChange={handleChange}
       sx={{
         '& .MuiPaginationItem-root': {
           color: '#E4E4E7',
@@ -104,8 +125,7 @@ export const SaveImageButton: React.FC<SaveButtonProps> = ({ isSaved, ...props }
         '&.Mui-disabled': {
           backgroundColor: isSaved ? '#7C71FF' : '#212936'
         }
-      }}
-    >
+      }}>
       <Image src={'/assets/bookmark.svg'} width={22} height={22} alt="save icon" />
     </IconButton>
   );
@@ -136,8 +156,7 @@ export const GenerateWithSettingsButton: React.FC<GenerateWithSettingsButtonProp
         backgroundColor: '#7C71FF',
         color: '#E4E4E7',
         textTransform: 'none'
-      }}
-    >
+      }}>
       Generate with this settings
     </Button>
   );
