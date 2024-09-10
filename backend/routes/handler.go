@@ -3,6 +3,8 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 	"mime"
 	"net/http"
 	"os"
@@ -219,9 +221,9 @@ func generateImage(context *gin.Context) {
 		session := sessions.Default(context)
 		userId := session.Get("user_id")
 
-		isDone := make(chan bool, 1)
+		pr, pw := io.Pipe()
 
-		go func(res *http.Response, userId interface{}, contentType string) {
+		go func(r io.Reader, userId interface{}, contentType string) {
 			format, err := mime.ExtensionsByType(contentType)
 			if err == nil {
 				filemeta := db.FileMeta{
@@ -231,7 +233,7 @@ func generateImage(context *gin.Context) {
 					Height:      int32(height),
 					Format:      strings.ReplaceAll(format[0], ".", ""),
 				}
-				if fileId, err := db.UploadFile(filemeta, res.Body); err == nil {
+				if fileId, err := db.UploadFile(filemeta, r); err == nil {
 					db.SaveImage(db.Image{
 						ImageId:        fileId,
 						Prompt:         prompt,
@@ -244,15 +246,35 @@ func generateImage(context *gin.Context) {
 					})
 				}
 			}
-			isDone <- true
-		}(res, userId, content_type)
+		}(pr, userId, content_type)
 
-		context.DataFromReader(200, res.ContentLength, content_type, res.Body, nil)
+		defer res.Body.Close()
 
-		if <-isDone {
-			close(isDone)
-			res.Body.Close()
-		}
+		context.Stream(func(w io.Writer) bool {
+			buf := make([]byte, 1024)
+			for {
+				if n, err := res.Body.Read(buf); err != nil {
+					if err == io.EOF {
+						if n <= 0 {
+							clear(buf)
+							break
+						}
+					} else {
+						log.Printf("Error reading data: %v", err)
+						return false
+					}
+				} else {
+					if _, err = w.Write(buf[:n]); err != nil {
+						log.Printf("Error while writing data: %v", err)
+						return false
+					}
+					if _, err = pw.Write(buf[:n]); err != nil {
+						log.Printf("Error while writing data: %v", err)
+					}
+				}
+			}
+			return false
+		})
 	}
 
 }

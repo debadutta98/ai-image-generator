@@ -46,3 +46,4 @@ func Some[T interface{}](arr []T, cb func(v T, i int) bool) bool {
 	}
 	return false
 }
+
