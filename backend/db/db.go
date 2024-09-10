@@ -212,10 +212,6 @@ func GetFeed(userId interface{}, searchQuery string, limit int, page int, coll b
 		pipeline = append(pipeline, bson.D{{Key: "$match", Value: bson.D{{Key: "prompt", Value: bson.D{{Key: "$regex", Value: fmt.Sprintf(".*%s.*", regexp.QuoteMeta(strings.Trim(searchQuery, "")))}, {Key: "$options", Value: "i"}}}}}})
 	}
 
-	if userId != nil {
-		pipeline = append(pipeline, bson.D{{Key: "$match", Value: bson.D{{Key: "user_id", Value: userId}}}})
-	}
-
 	pipeline = append(pipeline, bson.D{{Key: "$lookup", Value: bson.D{{Key: "from", Value: "user"}, {Key: "localField", Value: "user_id"}, {Key: "foreignField", Value: "user_id"}, {Key: "as", Value: "user"}}}})
 	pipeline = append(pipeline, bson.D{{Key: "$unwind", Value: "$user"}})
 	pipeline = append(pipeline, bson.D{{Key: "$addFields", Value: bson.D{{Key: "isSaved", Value: bson.D{{Key: "$cond", Value: append(bson.A{}, bson.D{{Key: "$in", Value: bson.A{userId, "$collection"}}}, true, false)}}}}}})

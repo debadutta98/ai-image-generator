@@ -1,15 +1,13 @@
 package routes
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"image"
-	"image/jpeg"
-	"image/png"
+	"mime"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/debadutta98/ai-image-generator/api"
@@ -210,69 +208,45 @@ func generateImage(context *gin.Context) {
 		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	} else {
+
 		defer res.Body.Close()
+
 		content_type := res.Header.Get("Content-Type")
+
 		if res.StatusCode != http.StatusOK || content_type == "application/json" {
 			context.DataFromReader(res.StatusCode, res.ContentLength, content_type, res.Body, nil)
 			return
 		}
-		img, format, err := image.Decode(res.Body)
-		if err != nil {
-			context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-			return
-		}
+
 		session := sessions.Default(context)
 		userId := session.Get("user_id")
 
-		go func(img image.Image) {
-			w := new(bytes.Buffer)
-			if content_type == "image/jpeg" {
-				if err = jpeg.Encode(w, img, nil); err != nil {
-					return
+		go func(res *http.Response, userId interface{}, contentType string) {
+			format, err := mime.ExtensionsByType(contentType)
+			if err != nil {
+				filemeta := db.FileMeta{
+					GeneratedBy: userId,
+					GeneratedAt: time.Now(),
+					Width:       int32(width),
+					Height:      int32(height),
+					Format:      strings.ReplaceAll(format[0], ".", ""),
 				}
-			} else if content_type == "image/png" {
-				if err := png.Encode(w, img); err != nil {
-					return
+				if fileId, err := db.UploadFile(filemeta, res.Body); err == nil {
+					db.SaveImage(db.Image{
+						ImageId:        fileId,
+						Prompt:         prompt,
+						Seed:           int64(seed),
+						Color:          color,
+						GuidanceScale:  float64(guidance),
+						NegativePrompt: negative_prompt,
+						Collection:     make([]interface{}, 0),
+						UserId:         userId,
+					})
 				}
-			} else {
-				return
 			}
-			filemeta := db.FileMeta{
-				GeneratedBy: userId,
-				GeneratedAt: time.Now(),
-				Width:       int32(width),
-				Height:      int32(height),
-				Format:      format,
-			}
-			if fileId, err := db.UploadFile(filemeta, w); err == nil {
-				db.SaveImage(db.Image{
-					ImageId:        fileId,
-					Prompt:         prompt,
-					Seed:           int64(seed),
-					Color:          color,
-					GuidanceScale:  float64(guidance),
-					NegativePrompt: negative_prompt,
-					Collection:     make([]interface{}, 0),
-					UserId:         userId,
-				})
-			}
-		}(img)
-		context.Status(res.StatusCode)
-		context.Writer.Header().Add("Content-Type", content_type)
-		if content_type == "image/jpeg" {
-			if err = jpeg.Encode(context.Writer, img, nil); err != nil {
-				context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Unable to process jpeg image"})
-				return
-			}
-		} else if content_type == "image/png" {
-			if err := png.Encode(context.Writer, img); err != nil {
-				context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Unable to process png image"})
-				return
-			}
-		} else {
-			context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Bad Image Content Type"})
-			return
-		}
+		}(res, userId, content_type)
+
+		context.DataFromReader(200, res.ContentLength, content_type, res.Body, nil)
 	}
 
 }
