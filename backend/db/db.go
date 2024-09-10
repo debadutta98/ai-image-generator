@@ -3,11 +3,13 @@ package db
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"math"
 	"mime"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -206,8 +208,8 @@ func GetFeed(userId interface{}, searchQuery string, limit int, page int, coll b
 
 	pipeline := mongo.Pipeline{}
 
-	if searchQuery != "" {
-		pipeline = append(pipeline, bson.D{{Key: "$match", Value: bson.D{{Key: "prompt", Value: bson.D{{Key: "$regex", Value: strings.Trim(searchQuery, " ")}, {Key: "$options", Value: "i"}}}}}})
+	if strings.Trim(searchQuery, "") != "" {
+		pipeline = append(pipeline, bson.D{{Key: "$match", Value: bson.D{{Key: "prompt", Value: bson.D{{Key: "$regex", Value: fmt.Sprintf(".*%s.*", regexp.QuoteMeta(strings.Trim(searchQuery, "")))}, {Key: "$options", Value: "i"}}}}}})
 	}
 
 	if userId != nil {

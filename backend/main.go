@@ -7,6 +7,7 @@ import (
 	"github.com/Kardbord/hfapigo/v3"
 	"github.com/debadutta98/ai-image-generator/db"
 	"github.com/debadutta98/ai-image-generator/routes"
+	"github.com/debadutta98/ai-image-generator/utils"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/mongo/mongodriver"
 	"github.com/gin-gonic/gin"
@@ -27,13 +28,11 @@ func main() {
 
 	collection := db.GetCollection("sessions")
 
-	//secret, err := utils.GenerateRandomString(20)
+	secret, err := utils.GenerateRandomString(20)
 
-	// if err != nil {
-	// 	log.Fatal("Unable to generate cookie secret")
-	// }
-
-	secret := "sdadad"
+	if err != nil {
+		log.Fatal("Unable to generate cookie secret")
+	}
 
 	app.Use(sessions.Sessions("user_session", mongodriver.NewStore(collection, 10*24*3600, true, []byte(secret))))
 
