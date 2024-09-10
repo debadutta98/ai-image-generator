@@ -1,15 +1,15 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  images:{
-    remotePatterns:[
+  images: {
+    remotePatterns: [
       {
         protocol: 'https',
         hostname: 'avatars.githubusercontent.com',
         port: '',
       },
       {
-        protocol:'https',
+        protocol: 'https',
         hostname: 'picsum.photos',
         port: ''
       }
@@ -26,14 +26,15 @@ const nextConfig = {
   },
   async rewrites() {
     return [
-      { source: '/auth/:path*', destination: `${process.env.BACKEND_URL}/auth/:path*`}
+      { source: '/api/:path*', destination: `${process.env.BACKEND_URL}/api/:path*` },
+      { source: '/auth/:path*', destination: `${process.env.BACKEND_URL}/auth/:path*` }
     ];
   },
   async redirects() {
     return [
-      {source: '/feed', destination:'/feed/1', permanent: true},
-      {source:'/history', destination:'/history/1',permanent: true},
-      {source:'/collection', destination:'/collection/1',permanent: true}
+      { source: '/feed', destination: '/feed/1', permanent: true },
+      { source: '/history', destination: '/history/1', permanent: true },
+      { source: '/collection', destination: '/collection/1', permanent: true }
     ]
   }
 };

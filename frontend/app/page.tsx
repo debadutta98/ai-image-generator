@@ -299,6 +299,7 @@ export default function Home() {
                   startIcon={
                     <Image src="/assets/Magic.svg" width={30} height={30} alt="magic icon" />
                   }
+                  disabled={isSubmitting}
                 >
                   Generate Image
                 </GenerateImageButton>
