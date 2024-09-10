@@ -4,12 +4,14 @@ import Error from '.';
 import { useAppContext } from '@/context';
 export default function Empty(props: { message?: string }) {
   const context = useAppContext();
-
+  const name = context.name;
   return (
     <Error>
       <h2 className="font-semibold">Empty Response - No data received</h2>
       <span>
-        Hi {context.name.split(' ')[0]}, {props.message || 'no image has been generated.'}
+        {name
+          ? `Hi ${context.name.split(' ')[0]}, ${props.message || 'no image has been generated.'}`
+          : 'No image has been generated'}
       </span>
       <Link href="/" className="text-colSky">
         Generate
