@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/debadutta98/ai-image-generator/api"
@@ -223,7 +224,8 @@ func generateImage(context *gin.Context) {
 		userId := session.Get("user_id")
 
 		pr, pw := io.Pipe()
-
+		wait := sync.WaitGroup{}
+		wait.Add(1)
 		go func() {
 			format, err := mime.ExtensionsByType(content_type)
 			if err != nil {
@@ -236,14 +238,13 @@ func generateImage(context *gin.Context) {
 					Height:      int32(height),
 					Format:      strings.ReplaceAll(format[0], ".", ""),
 				}
-				if fileId, w, err := db.UploadFile(filemeta); err != nil {
+				if w, err := db.UploadFile(filemeta); err != nil {
 					log.Println("error while upload file", err)
 				} else {
-					imageId, _ := json.Marshal(fileId)
-					if _id, err := primitive.ObjectIDFromHex(strings.Trim(string(imageId), `"`)); err != nil {
+					fileId, _ := json.Marshal(w.FileID)
+					if _id, err := primitive.ObjectIDFromHex(strings.Trim(string(fileId), `"`)); err != nil {
 						log.Println("not a valid object id", err)
 					} else {
-						defer pr.Close()
 						if err = utils.Pump(pr, w); err != nil {
 							log.Println("error while upload image", err)
 						} else {
@@ -257,18 +258,25 @@ func generateImage(context *gin.Context) {
 								Collection:     make([]interface{}, 0),
 								UserId:         userId,
 							})
+							pr.Close()
+							w.Close()
 						}
 					}
 				}
 			}
+			wait.Done()
 		}()
 
-		defer res.Body.Close()
-		defer pw.Close()
+		context.Writer.Header().Add("Content-Type", content_type)
+		context.Writer.Header().Add("Content-Length", strconv.Itoa(int(res.ContentLength)))
+
 		context.Stream(func(w io.Writer) bool {
 			utils.Pump(res.Body, w, pw)
+			pw.Close()
+			res.Body.Close()
 			return false
 		})
+		wait.Wait()
 	}
 
 }

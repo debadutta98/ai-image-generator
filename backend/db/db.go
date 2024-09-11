@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"math"
 	"mime"
@@ -73,13 +72,13 @@ func GetUser(user_id float64) (User, error) {
 	return user, err
 }
 
-func UploadFile(upload_meta FileMeta) (interface{}, io.Writer, error) {
+func UploadFile(upload_meta FileMeta) (*gridfs.UploadStream, error) {
 	uploadOptions := options.GridFSUpload().SetMetadata(upload_meta)
 	filename := uuid.Must(uuid.NewRandom()).String() + "." + upload_meta.Format
 	if stream, err := bucket.OpenUploadStream(filename, uploadOptions); err != nil {
-		return nil, nil, err
+		return nil, err
 	} else {
-		return stream.FileID, stream, nil
+		return stream, nil
 	}
 }
 

@@ -64,6 +64,11 @@ func Pump(r io.Reader, w ...io.Writer) error {
 				return err
 			}
 		} else {
+			if len(w) > 1 {
+				log.Println("writing to stream")
+			} else {
+				log.Println("writing to mongo")
+			}
 			if _, err = mw.Write(buf[:n]); err != nil {
 				log.Printf("Error while writing data: %v\n", err)
 				return err
