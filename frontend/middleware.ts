@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export const maxDuration = 120;
+export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
