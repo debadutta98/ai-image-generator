@@ -219,13 +219,16 @@ func generateImage(context *gin.Context) {
 		}
 
 		session := sessions.Default(context)
+
 		userId := session.Get("user_id")
 
 		pr, pw := io.Pipe()
 
-		go func(r io.Reader, userId interface{}, contentType string) {
-			format, err := mime.ExtensionsByType(contentType)
-			if err == nil {
+		go func() {
+			format, err := mime.ExtensionsByType(content_type)
+			if err != nil {
+				log.Println("can't get content type", err)
+			} else {
 				filemeta := db.FileMeta{
 					GeneratedBy: userId,
 					GeneratedAt: time.Now(),
@@ -233,47 +236,37 @@ func generateImage(context *gin.Context) {
 					Height:      int32(height),
 					Format:      strings.ReplaceAll(format[0], ".", ""),
 				}
-				if fileId, err := db.UploadFile(filemeta, r); err == nil {
-					db.SaveImage(db.Image{
-						ImageId:        fileId,
-						Prompt:         prompt,
-						Seed:           int64(seed),
-						Color:          color,
-						GuidanceScale:  float64(guidance),
-						NegativePrompt: negative_prompt,
-						Collection:     make([]interface{}, 0),
-						UserId:         userId,
-					})
+				if fileId, w, err := db.UploadFile(filemeta); err != nil {
+					log.Println("error while upload file", err)
+				} else {
+					imageId, _ := json.Marshal(fileId)
+					if _id, err := primitive.ObjectIDFromHex(strings.Trim(string(imageId), `"`)); err != nil {
+						log.Println("not a valid object id", err)
+					} else {
+						defer pr.Close()
+						if err = utils.Pump(pr, w); err != nil {
+							log.Println("error while upload image", err)
+						} else {
+							db.SaveImage(db.Image{
+								ImageId:        _id,
+								Prompt:         prompt,
+								Seed:           int64(seed),
+								Color:          color,
+								GuidanceScale:  float64(guidance),
+								NegativePrompt: negative_prompt,
+								Collection:     make([]interface{}, 0),
+								UserId:         userId,
+							})
+						}
+					}
 				}
 			}
-		}(pr, userId, content_type)
+		}()
 
 		defer res.Body.Close()
-
+		defer pw.Close()
 		context.Stream(func(w io.Writer) bool {
-			buf := make([]byte, 1024)
-			for {
-				if n, err := res.Body.Read(buf); err != nil {
-					if err == io.EOF {
-						if n <= 0 {
-							clear(buf)
-							break
-						}
-					} else {
-						log.Printf("Error reading data: %v", err)
-						return false
-					}
-				} else {
-					chunk := buf[:n]
-					if _, err = w.Write(chunk); err != nil {
-						log.Printf("Error while writing data: %v", err)
-						return false
-					}
-					if _, err = pw.Write(chunk); err != nil {
-						log.Printf("Error while writing data: %v", err)
-					}
-				}
-			}
+			utils.Pump(res.Body, w, pw)
 			return false
 		})
 	}

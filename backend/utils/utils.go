@@ -4,6 +4,8 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
+	"io"
+	"log"
 )
 
 func GenerateRandomString(length int) (string, error) {
@@ -47,3 +49,26 @@ func Some[T interface{}](arr []T, cb func(v T, i int) bool) bool {
 	return false
 }
 
+func Pump(r io.Reader, w ...io.Writer) error {
+	buf := make([]byte, 1024)
+	mw := io.MultiWriter(w...)
+	for {
+		if n, err := r.Read(buf); err != nil {
+			if err == io.EOF {
+				if n <= 0 {
+					clear(buf)
+					break
+				}
+			} else {
+				log.Printf("Error reading data: %v\n", err)
+				return err
+			}
+		} else {
+			if _, err = mw.Write(buf[:n]); err != nil {
+				log.Printf("Error while writing data: %v\n", err)
+				return err
+			}
+		}
+	}
+	return nil
+}

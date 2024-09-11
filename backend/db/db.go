@@ -73,14 +73,13 @@ func GetUser(user_id float64) (User, error) {
 	return user, err
 }
 
-func UploadFile(upload_meta FileMeta, r io.Reader) (primitive.ObjectID, error) {
+func UploadFile(upload_meta FileMeta) (interface{}, io.Writer, error) {
 	uploadOptions := options.GridFSUpload().SetMetadata(upload_meta)
 	filename := uuid.Must(uuid.NewRandom()).String() + "." + upload_meta.Format
-	uploadedId, err := bucket.UploadFromStream(filename, r, uploadOptions)
-	if err != nil {
-		return uploadedId, err
+	if stream, err := bucket.OpenUploadStream(filename, uploadOptions); err != nil {
+		return nil, nil, err
 	} else {
-		return uploadedId, nil
+		return stream.FileID, stream, nil
 	}
 }
 
