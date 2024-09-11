@@ -22,4 +22,5 @@ func RegisterRoutes(app *gin.Engine) {
 	apiRoute.DELETE("/user/image/remove", middlewares.CheckAuth, deleteUserFromImageCollection)
 	apiRoute.GET("/image/:fileId", getImage)
 	apiRoute.GET("/image/setting/:imageId", getImageSetting)
+	apiRoute.GET("/health", getHealthCheckStatus)
 }

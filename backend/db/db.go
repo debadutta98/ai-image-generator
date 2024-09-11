@@ -338,3 +338,13 @@ func GetImageInfo(imageId primitive.ObjectID) (map[string]interface{}, error) {
 		}
 	}
 }
+
+func IsMongoConnected() bool {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	if res := db.RunCommand(ctx, "ping"); res.Err() != nil {
+		return false
+	} else {
+		return true
+	}
+}

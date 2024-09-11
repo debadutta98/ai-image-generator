@@ -530,3 +530,7 @@ func logoutUser(context *gin.Context) {
 	session.Save()
 	context.Redirect(http.StatusSeeOther, "/")
 }
+
+func getHealthCheckStatus(context *gin.Context) {
+	context.JSON(http.StatusOK, gin.H{"mongoStatus": db.IsMongoConnected(), "server": true})
+}
